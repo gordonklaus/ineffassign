@@ -59,8 +59,29 @@ type checker struct {
 	loops, funcLits int
 }
 
+// TODO: Be less conservative: Take variable scope into consideration in loops and func literals.
 func (chk *checker) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
+	case *ast.AssignStmt:
+		for _, x := range append(n.Rhs, n.Lhs...) {
+			ast.Walk(chk, x)
+		}
+		if n.Tok == token.ASSIGN {
+			for _, x := range n.Lhs {
+				if i, ok := unparen(x).(*ast.Ident); ok {
+					// Conservatively ignore assignments inside loops.
+					if chk.loops == 0 && i.Obj != nil {
+						chk.assignedNotUsed[i.Obj] = i
+					}
+				}
+			}
+		}
+		return nil
+	case *ast.BranchStmt:
+		// A goto may act as a loop.  Conservatively ignore any assignments occurring before it.
+		if n.Tok == token.GOTO {
+			chk.assignedNotUsed = map[*ast.Object]*ast.Ident{}
+		}
 	case *ast.FuncType:
 		if n.Results != nil {
 			for _, f := range n.Results.List {
@@ -69,21 +90,24 @@ func (chk *checker) Visit(n ast.Node) ast.Visitor {
 				}
 			}
 		}
-	case *ast.AssignStmt:
-		for _, x := range append(n.Rhs, n.Lhs...) {
-			ast.Walk(chk, x)
+	case *ast.Ident:
+		delete(chk.assignedNotUsed, n.Obj)
+		// Conservatively mark any variable mentioned in a func literal as escaping.
+		if chk.funcLits > 0 {
+			chk.escapes[n.Obj] = true
 		}
-		if n.Tok == token.ASSIGN {
-			for _, x := range n.Lhs {
-				if i, ok := unparen(x).(*ast.Ident); ok {
-					// TODO: ignore chk.loops if i.Obj was declared in the current loop
-					if chk.loops == 0 && i.Obj != nil {
-						chk.assignedNotUsed[i.Obj] = i
-					}
-				}
+	case *ast.UnaryExpr:
+		if i, ok := unparen(n.X).(*ast.Ident); n.Op == token.AND && ok {
+			chk.escapes[i.Obj] = true
+		}
+	case *ast.CallExpr:
+		// A method call might implicitly take the address of its receiver, causing it to escape.
+		// We can't do any better here without knowing the variable's type.
+		if s, ok := unparen(n.Fun).(*ast.SelectorExpr); ok {
+			if i, ok := unparen(s.X).(*ast.Ident); ok {
+				chk.escapes[i.Obj] = true
 			}
 		}
-		return nil
 	case *ast.ForStmt:
 		walk(chk, n.Init)
 		chk.loops++
@@ -106,26 +130,6 @@ func (chk *checker) Visit(n ast.Node) ast.Visitor {
 		walk(chk, n.Body)
 		chk.funcLits--
 		return nil
-	case *ast.BranchStmt:
-		if n.Tok == token.GOTO {
-			// conservative
-			chk.assignedNotUsed = map[*ast.Object]*ast.Ident{}
-		}
-	case *ast.Ident:
-		delete(chk.assignedNotUsed, n.Obj)
-		if chk.funcLits > 0 {
-			chk.escapes[n.Obj] = true
-		}
-	case *ast.UnaryExpr:
-		if i, ok := unparen(n.X).(*ast.Ident); n.Op == token.AND && ok {
-			chk.escapes[i.Obj] = true
-		}
-	case *ast.CallExpr:
-		if s, ok := unparen(n.Fun).(*ast.SelectorExpr); ok {
-			if i, ok := unparen(s.X).(*ast.Ident); ok {
-				chk.escapes[i.Obj] = true
-			}
-		}
 	}
 	return chk
 }
@@ -141,22 +145,4 @@ func unparen(x ast.Expr) ast.Expr {
 		return unparen(p.X)
 	}
 	return x
-}
-
-type T int
-
-func (T) f() {}
-
-func f() {
-	x := T(0)
-	x = 1
-	x.f()
-	for x = 3; ; {
-		for {
-		}
-		x := 0
-		x = 1
-		_ = x
-		x = 2
-	}
 }
