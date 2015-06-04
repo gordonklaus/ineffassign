@@ -6,9 +6,8 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"path/filepath"
 	"strings"
-
-	"github.com/kr/fs"
 )
 
 func main() {
@@ -17,21 +16,20 @@ func main() {
 		return
 	}
 
-	walker := fs.Walk(os.Args[1])
-	for walker.Step() {
-		if err := walker.Err(); err != nil {
+	filepath.Walk(os.Args[1], func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
 			fmt.Printf("Error during filesystem walk: %v\n", err)
-			continue
+			return nil
 		}
 
-		if walker.Stat().IsDir() || !strings.HasSuffix(walker.Path(), ".go") {
-			continue
+		if fi.IsDir() || !strings.HasSuffix(path, ".go") {
+			return nil
 		}
 
 		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, walker.Path(), nil, 0)
+		f, err := parser.ParseFile(fset, path, nil, 0)
 		if err != nil {
-			continue
+			return nil
 		}
 
 		chk := &checker{map[*ast.Object]*ast.Ident{}, map[*ast.Object]bool{}, 0, 0}
@@ -50,7 +48,8 @@ func main() {
 				fmt.Println(fset.Position(i.Pos()), i.Name)
 			}
 		}
-	}
+		return nil
+	})
 }
 
 type checker struct {
