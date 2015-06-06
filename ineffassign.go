@@ -30,29 +30,34 @@ func main() {
 		return
 	}
 
-	filepath.Walk(root, checkPath)
+	errors := 0
+	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("Error during filesystem walk: %v\n", err)
+			return nil
+		}
+		if fi.IsDir() {
+			if *dontRecurseFlag && path != root {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") {
+			return nil
+		}
+		errors += checkPath(path)
+		return nil
+	})
+	if errors > 0 {
+		os.Exit(1)
+	}
 }
 
-func checkPath(path string, fi os.FileInfo, err error) error {
-	if err != nil {
-		fmt.Printf("Error during filesystem walk: %v\n", err)
-		return nil
-	}
-
-	if fi.IsDir() {
-		if *dontRecurseFlag && path != root {
-			return filepath.SkipDir
-		}
-		return nil
-	}
-	if !strings.HasSuffix(path, ".go") {
-		return nil
-	}
-
+func checkPath(path string) (errors int) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, 0)
 	if err != nil {
-		return nil
+		return errors
 	}
 
 	chk := &checker{map[*ast.Object]*ast.Ident{}, map[*ast.Object]bool{}, 0, 0}
@@ -69,9 +74,10 @@ func checkPath(path string, fi os.FileInfo, err error) error {
 	for _, i := range chk.assignedNotUsed {
 		if !chk.escapes[i.Obj] {
 			fmt.Println(fset.Position(i.Pos()), i.Name)
+			errors++
 		}
 	}
-	return nil
+	return errors
 }
 
 type checker struct {
