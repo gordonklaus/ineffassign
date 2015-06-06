@@ -73,7 +73,8 @@ func checkPath(path string) (errors int) {
 	ast.Walk(chk, f)
 	for _, i := range chk.assignedNotUsed {
 		if !chk.escapes[i.Obj] {
-			fmt.Println(fset.Position(i.Pos()), i.Name)
+			fmt.Printf("%s: %s is assigned but not used\n",
+				fset.Position(i.Pos()), i.Name)
 			errors++
 		}
 	}
