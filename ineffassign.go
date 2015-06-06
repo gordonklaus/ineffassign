@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -10,46 +11,67 @@ import (
 	"strings"
 )
 
+var (
+	root            string
+	dontRecurseFlag = flag.Bool("n", false, "don't recursively check paths")
+)
+
 func main() {
-	if len(os.Args) != 2 {
+	flag.Parse()
+	if len(flag.Args()) != 1 {
 		fmt.Println("missing argument: filepath")
 		return
 	}
 
-	filepath.Walk(os.Args[1], func(path string, fi os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("Error during filesystem walk: %v\n", err)
-			return nil
-		}
+	var err error
+	root, err = filepath.Abs(flag.Arg(0))
+	if err != nil {
+		fmt.Printf("Error finding absolute path :%s", err)
+		return
+	}
 
-		if fi.IsDir() || !strings.HasSuffix(path, ".go") {
-			return nil
-		}
+	filepath.Walk(root, checkPath)
+}
 
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, path, nil, 0)
-		if err != nil {
-			return nil
-		}
+func checkPath(path string, fi os.FileInfo, err error) error {
+	if err != nil {
+		fmt.Printf("Error during filesystem walk: %v\n", err)
+		return nil
+	}
 
-		chk := &checker{map[*ast.Object]*ast.Ident{}, map[*ast.Object]bool{}, 0, 0}
-		for _, d := range f.Decls {
-			if d, ok := d.(*ast.GenDecl); ok && d.Tok == token.VAR {
-				for _, s := range d.Specs {
-					for _, i := range s.(*ast.ValueSpec).Names {
-						chk.escapes[i.Obj] = true
-					}
+	if fi.IsDir() {
+		if *dontRecurseFlag && path != root {
+			return filepath.SkipDir
+		}
+		return nil
+	}
+	if !strings.HasSuffix(path, ".go") {
+		return nil
+	}
+
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, path, nil, 0)
+	if err != nil {
+		return nil
+	}
+
+	chk := &checker{map[*ast.Object]*ast.Ident{}, map[*ast.Object]bool{}, 0, 0}
+	for _, d := range f.Decls {
+		if d, ok := d.(*ast.GenDecl); ok && d.Tok == token.VAR {
+			for _, s := range d.Specs {
+				for _, i := range s.(*ast.ValueSpec).Names {
+					chk.escapes[i.Obj] = true
 				}
 			}
 		}
-		ast.Walk(chk, f)
-		for _, i := range chk.assignedNotUsed {
-			if !chk.escapes[i.Obj] {
-				fmt.Println(fset.Position(i.Pos()), i.Name)
-			}
+	}
+	ast.Walk(chk, f)
+	for _, i := range chk.assignedNotUsed {
+		if !chk.escapes[i.Obj] {
+			fmt.Println(fset.Position(i.Pos()), i.Name)
 		}
-		return nil
-	})
+	}
+	return nil
 }
 
 type checker struct {
