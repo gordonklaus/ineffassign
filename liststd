@@ -1,50 +1,182 @@
-/usr/local/go/src/cmd/compile/internal/arm64/cgen.go:124:3 p
-/usr/local/go/src/cmd/compile/internal/arm64/ggen.go:443:3 p
-/usr/local/go/src/cmd/compile/internal/big/floatconv.go:367:2 m
-/usr/local/go/src/cmd/compile/internal/gc/cgen.go:3302:3 max
-/usr/local/go/src/cmd/compile/internal/gc/reg.go:1404:3 firstf
-/usr/local/go/src/cmd/compile/internal/ppc64/cgen.go:118:3 p
-/usr/local/go/src/cmd/compile/internal/ppc64/ggen.go:438:3 p
-/usr/local/go/src/cmd/cover/cover_test.go:62:2 err
-/usr/local/go/src/cmd/go/build.go:2935:3 cgoLDFLAGS
-/usr/local/go/src/cmd/link/internal/ld/dwarf.go:2136:4 sect
-/usr/local/go/src/cmd/link/internal/ld/sym.go:82:2 buf
-/usr/local/go/src/cmd/pprof/internal/profile/encode.go:279:12 err
-/usr/local/go/src/cmd/pprof/internal/profile/profile.go:131:10 err
-/usr/local/go/src/compress/flate/reader_test.go:63:2 buf0
-/usr/local/go/src/compress/flate/writer_test.go:30:2 buf0
-/usr/local/go/src/compress/lzw/reader_test.go:134:2 buf0
-/usr/local/go/src/compress/lzw/writer_test.go:124:2 buf0
-/usr/local/go/src/container/list/list_test.go:286:2 e1
-/usr/local/go/src/container/list/list_test.go:286:6 e2
-/usr/local/go/src/container/list/list_test.go:286:10 e3
-/usr/local/go/src/container/list/list_test.go:286:14 e4
-/usr/local/go/src/crypto/elliptic/p224.go:722:10 bytes
-/usr/local/go/src/crypto/tls/handshake_messages.go:284:3 z
-/usr/local/go/src/encoding/asn1/marshal.go:650:5 err
-/usr/local/go/src/encoding/pem/pem_test.go:43:10 remainder
-/usr/local/go/src/go/internal/gcimporter/exportdata.go:74:13 size
-/usr/local/go/src/go/printer/printer_test.go:154:8 err
-/usr/local/go/src/image/png/writer.go:269:3 best
-/usr/local/go/src/math/big/ftoa.go:285:2 m
-/usr/local/go/src/mime/multipart/multipart_test.go:408:2 p
-/usr/local/go/src/net/fd_plan9.go:70:4 err
-/usr/local/go/src/net/file_unix.go:66:7 err
-/usr/local/go/src/net/http/fs.go:399:5 name
-/usr/local/go/src/net/http/request_test.go:156:13 err
-/usr/local/go/src/net/udpsock_plan9.go:156:16 i
-/usr/local/go/src/os/env_test.go:109:2 value
-/usr/local/go/src/reflect/all_test.go:423:2 f
-/usr/local/go/src/regexp/syntax/parse.go:570:2 start
-/usr/local/go/src/runtime/lfstack_test.go:48:2 nodes
-/usr/local/go/src/runtime/mgc.go:971:2 mp
-/usr/local/go/src/runtime/mgc.go:719:2 mp
-/usr/local/go/src/runtime/os1_plan9.go:144:2 n
-/usr/local/go/src/runtime/race/testdata/mop_test.go:1037:2 x
-/usr/local/go/src/runtime/race/testdata/mop_test.go:1586:5 y
-/usr/local/go/src/runtime/race/testdata/mop_test.go:930:2 y
-/usr/local/go/src/runtime/race/testdata/mop_test.go:594:2 s
-/usr/local/go/src/syscall/dir_plan9.go:88:2 b
-/usr/local/go/src/syscall/dir_plan9.go:131:13 b
-/usr/local/go/src/syscall/exec_plan9.go:307:2 r1
-/usr/local/go/src/syscall/syscall_bsd_test.go:23:2 n
+/usr/local/go/src/bytes/buffer_test.go:164:3: c assigned and not used
+/usr/local/go/src/cmd/compile/internal/big/floatconv.go:367:2: m assigned and not used
+/usr/local/go/src/cmd/compile/internal/gc/cgen.go:3302:3: max assigned and not used
+/usr/local/go/src/cmd/compile/internal/gc/reg.go:1404:3: firstf assigned and not used
+/usr/local/go/src/cmd/cover/cover_test.go:62:2: err assigned and not used
+/usr/local/go/src/cmd/go/build.go:2935:3: cgoLDFLAGS assigned and not used
+/usr/local/go/src/cmd/internal/goobj/read.go:527:3: data assigned and not used
+/usr/local/go/src/cmd/link/internal/ld/dwarf.go:2600:3: addr assigned and not used
+/usr/local/go/src/cmd/link/internal/ld/elf.go:2076:3: resoff assigned and not used
+/usr/local/go/src/cmd/link/internal/ld/sym.go:82:2: buf assigned and not used
+/usr/local/go/src/cmd/pprof/internal/profile/encode.go:279:12: err assigned and not used
+/usr/local/go/src/cmd/pprof/internal/profile/profile.go:131:10: err assigned and not used
+/usr/local/go/src/compress/flate/reader_test.go:63:2: buf0 assigned and not used
+/usr/local/go/src/compress/flate/writer_test.go:30:2: buf0 assigned and not used
+/usr/local/go/src/compress/lzw/reader_test.go:134:2: buf0 assigned and not used
+/usr/local/go/src/compress/lzw/writer_test.go:124:2: buf0 assigned and not used
+/usr/local/go/src/container/list/list_test.go:286:6: e2 assigned and not used
+/usr/local/go/src/container/list/list_test.go:286:2: e1 assigned and not used
+/usr/local/go/src/container/list/list_test.go:286:14: e4 assigned and not used
+/usr/local/go/src/container/list/list_test.go:286:10: e3 assigned and not used
+/usr/local/go/src/crypto/elliptic/p224.go:722:10: bytes assigned and not used
+/usr/local/go/src/crypto/tls/handshake_messages.go:284:3: z assigned and not used
+/usr/local/go/src/database/sql/sql_test.go:1493:4: numOpen assigned and not used
+/usr/local/go/src/encoding/asn1/marshal.go:650:5: err assigned and not used
+/usr/local/go/src/encoding/base32/base32_test.go:120:4: count assigned and not used
+/usr/local/go/src/encoding/base64/base64_test.go:174:4: count assigned and not used
+/usr/local/go/src/encoding/pem/pem_test.go:43:10: remainder assigned and not used
+/usr/local/go/src/go/internal/gcimporter/exportdata.go:74:13: size assigned and not used
+/usr/local/go/src/go/printer/printer_test.go:154:8: err assigned and not used
+/usr/local/go/src/html/escape_test.go:143:3: n assigned and not used
+/usr/local/go/src/html/escape_test.go:151:3: n assigned and not used
+/usr/local/go/src/html/escape_test.go:128:3: n assigned and not used
+/usr/local/go/src/html/escape_test.go:135:3: n assigned and not used
+/usr/local/go/src/image/decode_test.go:124:9: err assigned and not used
+/usr/local/go/src/image/gif/writer.go:86:3: n assigned and not used
+/usr/local/go/src/image/png/writer.go:269:3: best assigned and not used
+/usr/local/go/src/math/big/ftoa.go:285:2: m assigned and not used
+/usr/local/go/src/math/jn.go:203:6: di assigned and not used
+/usr/local/go/src/math/jn.go:209:6: di assigned and not used
+/usr/local/go/src/mime/multipart/multipart_test.go:408:2: p assigned and not used
+/usr/local/go/src/net/fd_plan9.go:70:4: err assigned and not used
+/usr/local/go/src/net/file_unix.go:66:7: err assigned and not used
+/usr/local/go/src/net/http/fs.go:399:5: name assigned and not used
+/usr/local/go/src/net/http/request_test.go:156:13: err assigned and not used
+/usr/local/go/src/net/http/transport_test.go:2012:3: slurp assigned and not used
+/usr/local/go/src/net/udpsock_plan9.go:156:16: i assigned and not used
+/usr/local/go/src/os/env_test.go:109:2: value assigned and not used
+/usr/local/go/src/os/os_test.go:1010:5: err assigned and not used
+/usr/local/go/src/regexp/onepass.go:353:15: matchArg assigned and not used
+/usr/local/go/src/regexp/syntax/parse.go:570:2: start assigned and not used
+/usr/local/go/src/runtime/lfstack_test.go:48:2: nodes assigned and not used
+/usr/local/go/src/runtime/map_test.go:511:3: x assigned and not used
+/usr/local/go/src/runtime/mapspeed_test.go:75:3: sum assigned and not used
+/usr/local/go/src/runtime/mapspeed_test.go:27:3: sum assigned and not used
+/usr/local/go/src/runtime/mapspeed_test.go:118:3: sum assigned and not used
+/usr/local/go/src/runtime/mapspeed_test.go:96:3: sum assigned and not used
+/usr/local/go/src/runtime/mfinal_test.go:98:3: v assigned and not used
+/usr/local/go/src/runtime/mfinal_test.go:60:4: v assigned and not used
+/usr/local/go/src/runtime/os1_plan9.go:144:2: n assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:73:4: x1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:162:3: x2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:197:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:212:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:164:4: x1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:49:3: x2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:27:3: x2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:71:3: x2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:91:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:147:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:182:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:225:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:51:4: x1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:117:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:29:4: x1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:104:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/atomic_test.go:132:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:166:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:187:5: v1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:93:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:21:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:280:3: v1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:592:2: data assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:120:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:278:3: v2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:53:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:67:4: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:191:3: v2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:244:4: v1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:618:2: data assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:302:3: v2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:43:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:222:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:132:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:106:4: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:31:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:637:2: data assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:240:3: v2 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:567:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:148:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:81:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:304:3: v1 assigned and not used
+/usr/local/go/src/runtime/race/testdata/chan_test.go:208:2: v assigned and not used
+/usr/local/go/src/runtime/race/testdata/finalizer_test.go:66:2: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/io_test.go:34:10: err assigned and not used
+/usr/local/go/src/runtime/race/testdata/io_test.go:68:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/map_test.go:234:16: err assigned and not used
+/usr/local/go/src/runtime/race/testdata/map_test.go:137:2: m assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1586:5: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:217:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:930:2: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1037:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:487:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1726:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:459:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:971:4: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1953:6: tinySink assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:678:2: p assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:443:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:884:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:196:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:99:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:551:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:82:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:535:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:174:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:334:5: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:594:2: s assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:942:2: f assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:519:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:766:2: a assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:475:3: f assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1293:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:567:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1647:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1800:4: total assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:898:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:66:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:471:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:332:5: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:1586:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mop_test.go:503:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mutex_test.go:107:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mutex_test.go:44:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mutex_test.go:66:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mutex_test.go:88:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/mutex_test.go:25:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/rwmutex_test.go:46:3: y assigned and not used
+/usr/local/go/src/runtime/race/testdata/rwmutex_test.go:26:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:146:4: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:197:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:33:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:70:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:174:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:50:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/select_test.go:214:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:74:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:157:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:115:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:171:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:36:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/sync_test.go:195:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:53:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:96:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:197:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:22:4: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:73:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:213:2: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:235:3: x assigned and not used
+/usr/local/go/src/runtime/race/testdata/waitgroup_test.go:37:4: x assigned and not used
+/usr/local/go/src/runtime/softfloat64.go:228:3: f assigned and not used
+/usr/local/go/src/runtime/softfloat64.go:228:6: g assigned and not used
+/usr/local/go/src/runtime/stack_test.go:106:4: s assigned and not used
+/usr/local/go/src/runtime/vlop_arm_test.go:57:3: sum assigned and not used
+/usr/local/go/src/runtime/vlop_arm_test.go:39:3: sum assigned and not used
+/usr/local/go/src/sync/mutex_test.go:155:5: acc1 assigned and not used
+/usr/local/go/src/sync/mutex_test.go:154:5: acc0 assigned and not used
+/usr/local/go/src/sync/mutex_test.go:184:4: acc1 assigned and not used
+/usr/local/go/src/sync/mutex_test.go:183:4: acc0 assigned and not used
+/usr/local/go/src/syscall/dir_plan9.go:131:13: b assigned and not used
+/usr/local/go/src/syscall/dir_plan9.go:88:2: b assigned and not used
+/usr/local/go/src/syscall/exec_plan9.go:307:2: r1 assigned and not used
+/usr/local/go/src/syscall/syscall_bsd_test.go:23:2: n assigned and not used
