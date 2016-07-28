@@ -14,6 +14,7 @@ import (
 var (
 	root            string
 	dontRecurseFlag = flag.Bool("n", false, "don't recursively check paths")
+	verbose         = flag.Bool("v", false, "verbose output")
 )
 
 func main() {
@@ -57,6 +58,9 @@ func main() {
 }
 
 func checkPath(path string) (errors int) {
+	if *verbose {
+		fmt.Printf("%s\n", path)
+	}
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, 0)
 	if err != nil {
