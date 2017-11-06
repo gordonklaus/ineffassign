@@ -234,12 +234,17 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		for _, x := range n.Rhs {
 			bld.walk(x)
 		}
-		for _, x := range n.Lhs {
+		for i, x := range n.Lhs {
 			if id, ok := ident(x); ok {
 				if n.Tok >= token.ADD_ASSIGN && n.Tok <= token.AND_NOT_ASSIGN {
 					bld.use(id)
 				}
-				bld.assign(id)
+				// Don't treat explicit initialization to zero as assignment; it is often used as shorthand for a bare declaration.
+				if n.Tok == token.DEFINE && i < len(n.Rhs) && isZeroLiteral(n.Rhs[i]) {
+					bld.use(id)
+				} else {
+					bld.assign(id)
+				}
 			} else {
 				bld.walk(x)
 			}
@@ -321,6 +326,18 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		return bld
 	}
 	return nil
+}
+
+func isZeroLiteral(x ast.Expr) bool {
+	b, ok := x.(*ast.BasicLit)
+	if !ok {
+		return false
+	}
+	switch b.Value {
+	case "0", "0.0", "0.", ".0", `""`:
+		return true
+	}
+	return false
 }
 
 func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {

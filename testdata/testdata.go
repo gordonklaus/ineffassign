@@ -30,7 +30,25 @@ func _() {
 }
 
 func _() {
-	x := 0 //x
+	x := 0
+	x = 0
+	_ = x
+}
+
+func _() {
+	x := ""
+	x = "abc"
+	_ = x
+}
+
+func _() {
+	x := "abc" //x
+	x = "def"
+	_ = x
+}
+
+func _() {
+	x := 1 //x
 	x = 0
 	_ = x
 }
@@ -62,7 +80,7 @@ func _() {
 }
 
 func _() {
-	x := 0 //x
+	x := 1 //x
 	if b {
 		x = 0 //x
 	}
@@ -71,7 +89,7 @@ func _() {
 }
 
 func _() {
-	x := 0 //x
+	x := 1 //x
 	for b {
 		x = 0 //x
 	}
@@ -91,7 +109,7 @@ func _() {
 }
 
 func _() {
-	x := 0 //x
+	x := 1 //x
 	if b {
 		x = 0 //x
 		x = 0 //x
@@ -330,7 +348,7 @@ func _() {
 }
 
 func _() {
-	x := 0 //x
+	x := 1 //x
 	var ch chan int
 	select {
 	case ch <- 0:
