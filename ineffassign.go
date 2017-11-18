@@ -231,6 +231,10 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		}
 
 	case *ast.AssignStmt:
+		if n.Tok == token.QUO_ASSIGN || n.Tok == token.REM_ASSIGN {
+			bld.maybePanic()
+		}
+
 		for _, x := range n.Rhs {
 			bld.walk(x)
 		}
@@ -290,7 +294,21 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 				bld.use(id)
 			}
 		}
+	case *ast.SendStmt:
+		bld.maybePanic()
+		return bld
 
+	case *ast.BinaryExpr:
+		if n.Op == token.EQL || n.Op == token.QUO || n.Op == token.REM {
+			bld.maybePanic()
+		}
+		return bld
+	case *ast.CallExpr:
+		bld.maybePanic()
+		return bld
+	case *ast.IndexExpr:
+		bld.maybePanic()
+		return bld
 	case *ast.UnaryExpr:
 		id, ok := ident(n.X)
 		if ix, isIx := n.X.(*ast.IndexExpr); isIx {
@@ -304,6 +322,7 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		}
 		return bld
 	case *ast.SelectorExpr:
+		bld.maybePanic()
 		// A method call (possibly delayed via a method value) might implicitly take
 		// the address of its receiver, causing it to escape.
 		// We can't do any better here without knowing the variable's type.
@@ -314,12 +333,19 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		}
 		return bld
 	case *ast.SliceExpr:
+		bld.maybePanic()
 		// We don't care about slicing into slices, but without type information we can do no better.
 		if id, ok := ident(n.X); ok {
 			if v, ok := bld.vars[id.Obj]; ok {
 				v.escapes = true
 			}
 		}
+		return bld
+	case *ast.StarExpr:
+		bld.maybePanic()
+		return bld
+	case *ast.TypeAssertExpr:
+		bld.maybePanic()
 		return bld
 
 	default:
@@ -405,6 +431,19 @@ func (bld *builder) swtch(stmt ast.Stmt, cases []ast.Stmt) {
 	}
 	brek.setDestination(bld.newBlock(exits...))
 	bld.breaks.pop()
+}
+
+// An operation that might panic marks named function results as used.
+func (bld *builder) maybePanic() {
+	res := bld.results[len(bld.results)-1]
+	if res == nil {
+		return
+	}
+	for _, f := range res.List {
+		for _, id := range f.Names {
+			bld.use(id)
+		}
+	}
 }
 
 func (bld *builder) newBlock(parents ...*block) *block {

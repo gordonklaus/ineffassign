@@ -258,6 +258,78 @@ func _() (x int) {
 	return x
 }
 
+func _() (x int) {
+	x = 1
+	anyFunctionMightPanic()
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a[i]
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a[i:j]
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a == b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a / b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	a /= b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a % b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	a %= b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a.b
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = *a
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	_ = a.(int)
+	return 2
+}
+
+func _() (x int) {
+	x = 1
+	a <- b
+	return 2
+}
+
 func _() {
 	global = 0
 }
