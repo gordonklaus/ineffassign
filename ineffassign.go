@@ -435,6 +435,9 @@ func (bld *builder) swtch(stmt ast.Stmt, cases []ast.Stmt) {
 
 // An operation that might panic marks named function results as used.
 func (bld *builder) maybePanic() {
+	if len(bld.results) == 0 {
+		return
+	}
 	res := bld.results[len(bld.results)-1]
 	if res == nil {
 		return
