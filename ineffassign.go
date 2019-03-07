@@ -99,12 +99,15 @@ type builder struct {
 }
 
 type block struct {
-	children []*block
-	ops      map[*ast.Object][]operation
+	children   []*block
+	ops        map[*ast.Object][]operation
+	terminated bool
 }
 
 func (b *block) addChild(c *block) {
-	b.children = append(b.children, c)
+	if !b.terminated {
+		b.children = append(b.children, c)
+	}
 }
 
 type operation struct {
@@ -279,6 +282,9 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 	case *ast.Ident:
 		bld.use(n)
 	case *ast.ReturnStmt:
+		defer func() {
+			bld.block.terminated = true
+		}()
 		for _, x := range n.Results {
 			bld.walk(x)
 		}
