@@ -36,6 +36,18 @@ func _() {
 }
 
 func _() {
+	x := false
+	x = true
+	_ = x
+}
+
+func _() {
+	x := true //x
+	x = false
+	_ = x
+}
+
+func _() {
 	x := T(0)
 	x = 0
 	_ = x
