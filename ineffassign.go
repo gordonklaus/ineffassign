@@ -375,7 +375,8 @@ func isZeroInitializer(x ast.Expr) bool {
 			return true
 		}
 	case *ast.Ident:
-		return x.(*ast.Ident).Name == "false"
+		i := x.(*ast.Ident)
+		return i.Name == "false" && i.Obj == nil
 	}
 
 	return false

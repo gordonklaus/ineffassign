@@ -48,6 +48,13 @@ func _() {
 }
 
 func _() {
+	false := "not the real false"
+	x := false //x
+	x = "also not false"
+	_ = x
+}
+
+func _() {
 	x := T(0)
 	x = 0
 	_ = x
