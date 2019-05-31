@@ -368,15 +368,14 @@ func isZeroInitializer(x ast.Expr) bool {
 		x = c.Args[0]
 	}
 
-	switch x.(type) {
+	switch x := x.(type) {
 	case *ast.BasicLit:
-		switch x.(*ast.BasicLit).Value {
+		switch x.Value {
 		case "0", "0.0", "0.", ".0", `""`:
 			return true
 		}
 	case *ast.Ident:
-		i := x.(*ast.Ident)
-		return i.Name == "false" && i.Obj == nil
+		return x.Name == "false" && x.Obj == nil
 	}
 
 	return false
