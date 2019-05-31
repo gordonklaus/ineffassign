@@ -597,3 +597,12 @@ func _() {
 	}
 	_ = x
 }
+
+func _() {
+	x := 0
+	if b {
+		x = 1 // x
+		return
+	}
+	_ = x
+}
