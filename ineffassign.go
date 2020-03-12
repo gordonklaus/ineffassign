@@ -88,14 +88,16 @@ func checkPath(path string) (*token.FileSet, []*ast.CommentGroup, []*ast.Ident) 
 }
 
 type builder struct {
-	roots     []*block
-	block     *block
-	vars      map[*ast.Object]*variable
-	results   []*ast.FieldList
-	breaks    branchStack
-	continues branchStack
-	gotos     branchStack
-	labelStmt *ast.LabeledStmt
+	roots                 []*block
+	block                 *block
+	vars                  map[*ast.Object]*variable
+	results               []*ast.FieldList
+	breaks                branchStack
+	continues             branchStack
+	gotos                 branchStack
+	labelStmt             *ast.LabeledStmt
+	exit                  *block
+	isPostponedInvocation bool
 }
 
 type block struct {
@@ -292,6 +294,7 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 				}
 			}
 		}
+		bld.block.addChild(bld.exit)
 		bld.newBlock()
 	case *ast.SendStmt:
 		bld.maybePanic()
@@ -304,6 +307,15 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		return bld
 	case *ast.CallExpr:
 		bld.maybePanic()
+		isPostponedInvocation := bld.isPostponedInvocation
+		bld.isPostponedInvocation = false
+		if fl, inplace := n.Fun.(*ast.FuncLit); inplace && !isPostponedInvocation {
+			for _, arg := range n.Args {
+				bld.walk(arg)
+			}
+			bld.inplaceFun(fl.Type, fl.Body)
+			return nil
+		}
 		return bld
 	case *ast.IndexExpr:
 		bld.maybePanic()
@@ -346,6 +358,12 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 	case *ast.TypeAssertExpr:
 		bld.maybePanic()
 		return bld
+	case *ast.DeferStmt:
+		bld.isPostponedInvocation = true
+		bld.walk(n.Call)
+	case *ast.GoStmt:
+		bld.isPostponedInvocation = true
+		bld.walk(n.Call)
 
 	default:
 		return bld
@@ -387,16 +405,42 @@ func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {
 	bld.results = append(bld.results, typ.Results)
 
 	b := bld.block
+	e := bld.exit
+	bld.exit = bld.newBlock()
 	bld.newBlock()
 	bld.roots = append(bld.roots, bld.block)
 	bld.walk(typ)
 	bld.walk(body)
+	bld.block.addChild(bld.exit)
 	bld.block = b
+	bld.exit = e
 
 	bld.results = bld.results[:len(bld.results)-1]
 	for _, v := range bld.vars {
 		v.fundept--
 	}
+}
+
+func (bld *builder) inplaceFun(typ *ast.FuncType, body *ast.BlockStmt) {
+	bld.results = append(bld.results, typ.Results)
+
+	b0 := bld.block
+	e := bld.exit
+	bld.exit = bld.newBlock()
+	var parents []*block
+	if b0 != nil {
+		parents = []*block{b0}
+	}
+	bld.newBlock(parents...)
+
+	bld.walk(typ)
+	bld.walk(body)
+
+	bld.block.addChild(bld.exit)
+	bld.block = bld.exit
+
+	bld.results = bld.results[:len(bld.results)-1]
+	bld.exit = e
 }
 
 func (bld *builder) swtch(stmt ast.Stmt, cases []ast.Stmt) {

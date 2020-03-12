@@ -227,23 +227,23 @@ func _() {
 	func() {
 		_ = x
 	}()
-	x = 0
+	x = 0 // x
 }
 
 func _() {
 	x := 0
 	func() {
-		x++
+		x++ // x
 	}()
-	x = 0
+	x = 0 // x
 }
 
 func _() {
 	x := 0
 	func() {
-		x += 0
+		x += 0 // x
 	}()
-	x = 0
+	x = 0 // x
 }
 
 func _() {
@@ -258,7 +258,7 @@ func _() {
 	x := 0
 	_ = x
 	func() {
-		x = 0
+		x = 0 // x
 	}()
 }
 
@@ -625,3 +625,33 @@ func _() {
 	}
 	_ = x
 }
+
+func _() {
+	var x int
+	x = 1
+	go func(i int) {
+		_ = i
+	}(func() int {
+		return x
+	}())
+	x = 2
+	_ = x
+}
+
+func _() {
+	x := 1
+	defer func() {
+		x = 2
+	}()
+	_ = x
+}
+
+func _() {
+	x := 1
+	go func() {
+		x = 2
+	}()
+	_ = x
+}
+
+var initVar = func() int { return 1 }()
