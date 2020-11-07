@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"dmitri.shuralyov.com/go/generated"
 )
 
 const invalidArgumentExitCode = 3
@@ -56,6 +58,9 @@ func walkPath(root string) bool {
 			return nil
 		}
 		if !strings.HasSuffix(path, ".go") {
+			return nil
+		}
+		if isGenerated, _ := generated.ParseFile(path); isGenerated {
 			return nil
 		}
 		fset, _, ineff := checkPath(path)
