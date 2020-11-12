@@ -16,7 +16,10 @@ import (
 
 const invalidArgumentExitCode = 3
 
-var dontRecurseFlag = flag.Bool("n", false, "don't recursively check paths")
+var (
+	dontRecurseFlag = flag.Bool("n", false, "don't recursively check paths")
+	ignore          = flag.String("i", "", "<directory or file>;<directory or file>")
+)
 
 func main() {
 	flag.Parse()
@@ -26,6 +29,8 @@ func main() {
 		os.Exit(invalidArgumentExitCode)
 	}
 
+	ignoreList := strings.Split(*ignore, ";")
+
 	lintFailed := false
 	for _, path := range flag.Args() {
 		root, err := filepath.Abs(path)
@@ -33,7 +38,7 @@ func main() {
 			fmt.Printf("Error finding absolute path: %s", err)
 			os.Exit(invalidArgumentExitCode)
 		}
-		if walkPath(root) {
+		if walkPath(root, ignoreList) {
 			lintFailed = true
 		}
 	}
@@ -42,9 +47,26 @@ func main() {
 	}
 }
 
-func walkPath(root string) bool {
+func walkPath(root string, ignoreFiles []string) bool {
 	lintFailed := false
+
+	// Builds a map to improve the ignore files checking.
+	filesMap := make(map[string]bool, len(ignoreFiles))
+	for _, p := range ignoreFiles {
+		absPath, err := filepath.Abs(p)
+		if err != nil {
+			// Ignore this file...
+			continue
+		}
+		filesMap[absPath] = true
+	}
+
 	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+		// Check if the path are in the map.
+		if _, ok := filesMap[path]; ok {
+			return filepath.SkipDir
+		}
+
 		if err != nil {
 			fmt.Printf("Error during filesystem walk: %v\n", err)
 			return nil
