@@ -28,12 +28,13 @@ func main() {
 
 	lintFailed := false
 	for _, path := range flag.Args() {
-		root, err := filepath.Abs(path)
+		adjustedPath, recursive := checkRecursive(path)
+		root, err := filepath.Abs(adjustedPath)
 		if err != nil {
 			fmt.Printf("Error finding absolute path: %s", err)
 			os.Exit(invalidArgumentExitCode)
 		}
-		if walkPath(root) {
+		if walkPath(root, recursive) {
 			lintFailed = true
 		}
 	}
@@ -42,7 +43,16 @@ func main() {
 	}
 }
 
-func walkPath(root string) bool {
+func checkRecursive(path string) (adjustedPath string, recursive bool) {
+	pathLen := len(path)
+	if pathLen >= 5 && path[pathLen-3:] == "..." {
+		return path[:pathLen-3], true
+	}
+
+	return path, false
+}
+
+func walkPath(root string, recursive bool) bool {
 	lintFailed := false
 	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
@@ -50,7 +60,7 @@ func walkPath(root string) bool {
 			return nil
 		}
 		if fi.IsDir() {
-			if path != root && (*dontRecurseFlag ||
+			if path != root && (!recursive ||
 				filepath.Base(path) == "testdata" ||
 				filepath.Base(path) == "vendor") {
 				return filepath.SkipDir
