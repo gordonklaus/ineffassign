@@ -16,7 +16,7 @@ import (
 
 const invalidArgumentExitCode = 3
 
-var dontRecurseFlag = flag.Bool("n", false, "don't recursively check paths")
+var dontRecurseFlag = flag.Bool("n", false, "[DEPRECATED] don't recursively check paths")
 
 func main() {
 	flag.Parse()
