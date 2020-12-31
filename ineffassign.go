@@ -1,105 +1,47 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
-	"os"
-	"path/filepath"
 	"sort"
-	"strings"
 
-	"dmitri.shuralyov.com/go/generated"
+	"golang.org/x/tools/go/analysis"
+	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
-const invalidArgumentExitCode = 3
-
-var dontRecurseFlag = flag.Bool("n", false, "[DEPRECATED] don't recursively check paths")
-
 func main() {
-	flag.Parse()
-
-	if len(flag.Args()) == 0 {
-		fmt.Println("missing argument: filepath")
-		os.Exit(invalidArgumentExitCode)
-	}
-
-	lintFailed := false
-	for _, path := range flag.Args() {
-		adjustedPath, recursive := checkRecursive(path)
-		root, err := filepath.Abs(adjustedPath)
-		if err != nil {
-			fmt.Printf("Error finding absolute path: %s", err)
-			os.Exit(invalidArgumentExitCode)
-		}
-		if walkPath(root, recursive) {
-			lintFailed = true
-		}
-	}
-	if lintFailed {
-		os.Exit(1)
-	}
+	singlechecker.Main(Analyzer)
 }
 
-func checkRecursive(path string) (adjustedPath string, recursive bool) {
-	pathLen := len(path)
-	if pathLen >= 5 && path[pathLen-3:] == "..." {
-		return path[:pathLen-3], true
-	}
-
-	return path, false
+// Analyzer is the ineffassign analysis.Analyzer instance.
+var Analyzer = &analysis.Analyzer{
+	Name: "ineffassign",
+	Doc:  "detect ineffectual assignments in Go code",
+	Run:  checkPath,
 }
 
-func walkPath(root string, recursive bool) bool {
-	lintFailed := false
-	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("Error during filesystem walk: %v\n", err)
-			return nil
-		}
-		if fi.IsDir() {
-			if path != root && (!recursive ||
-				filepath.Base(path) == "testdata" ||
-				filepath.Base(path) == "vendor") {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if !strings.HasSuffix(path, ".go") {
-			return nil
-		}
-		if isGenerated, _ := generated.ParseFile(path); isGenerated {
-			return nil
-		}
-		fset, _, ineff := checkPath(path)
-		for _, id := range ineff {
-			fmt.Printf("%s: ineffectual assignment to %s\n", fset.Position(id.Pos()), id.Name)
-			lintFailed = true
-		}
-		return nil
-	})
-	return lintFailed
-}
+func checkPath(pass *analysis.Pass) (interface{}, error) {
+	files := pass.Files
+	for _, file := range files {
+		bld := &builder{vars: map[*ast.Object]*variable{}}
+		bld.walk(file)
 
-func checkPath(path string) (*token.FileSet, []*ast.CommentGroup, []*ast.Ident) {
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
-	if err != nil {
-		return nil, nil, nil
+		chk := &checker{vars: bld.vars, seen: map[*block]bool{}}
+		for _, b := range bld.roots {
+			chk.check(b)
+		}
+		sort.Sort(chk.ineff)
+
+		for _, id := range chk.ineff {
+			pass.Report(analysis.Diagnostic{
+				Pos: id.Pos(),
+				Message: fmt.Sprintf("ineffectual assignment to %s", id.Name),
+			})
+		}
 	}
 
-	bld := &builder{vars: map[*ast.Object]*variable{}}
-	bld.walk(f)
-
-	chk := &checker{vars: bld.vars, seen: map[*block]bool{}}
-	for _, b := range bld.roots {
-		chk.check(b)
-	}
-	sort.Sort(chk.ineff)
-
-	return fset, f.Comments, chk.ineff
+	return nil, nil
 }
 
 type builder struct {
