@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -12,6 +13,10 @@ import (
 
 func main() {
 	singlechecker.Main(Analyzer)
+}
+
+func init() {
+	flag.Bool("n", false, "don't recursively check paths (deprecated)")
 }
 
 // Analyzer is the ineffassign analysis.Analyzer instance.
@@ -35,7 +40,7 @@ func checkPath(pass *analysis.Pass) (interface{}, error) {
 
 		for _, id := range chk.ineff {
 			pass.Report(analysis.Diagnostic{
-				Pos: id.Pos(),
+				Pos:     id.Pos(),
 				Message: fmt.Sprintf("ineffectual assignment to %s", id.Name),
 			})
 		}
