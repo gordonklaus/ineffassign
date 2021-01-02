@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/token"
 	"sort"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/singlechecker"
@@ -27,8 +28,16 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func checkPath(pass *analysis.Pass) (interface{}, error) {
-	files := pass.Files
-	for _, file := range files {
+files:
+	for _, file := range pass.Files {
+		for _, cg := range file.Comments {
+			for _, c := range cg.List {
+				if strings.HasPrefix(c.Text, "// Code generated ") && strings.HasSuffix(c.Text, " DO NOT EDIT.") {
+					continue files
+				}
+			}
+		}
+
 		bld := &builder{vars: map[*ast.Object]*variable{}}
 		bld.walk(file)
 
