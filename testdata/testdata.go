@@ -55,7 +55,7 @@ func _() {
 }
 
 func _() {
-	x := T(0)
+	x := int(0)
 	x = 0
 	_ = x
 }
@@ -205,21 +205,22 @@ func _() {
 }
 
 func _() {
-	x := 0
+	type T struct{ f int }
+	x := T{}
 	_ = x.f
-	x = 0
+	x = T{}
 }
 
 func _() {
-	x := 0
+	x := []int{}
 	_ = &x[0]
-	x = 0
+	x = []int{}
 }
 
 func _() {
-	x := 0
+	x := []int{}
 	_ = x[:]
-	x = 0
+	x = []int{}
 }
 
 func _() {
@@ -283,75 +284,75 @@ func _() (x int) {
 	return x
 }
 
-func _() (x int) {
+func _(anyFunctionMightPanic func()) (x int) {
 	x = 1
 	anyFunctionMightPanic()
 	return 2
 }
 
-func _() (x int) {
+func _(a []int) (x int) {
 	x = 1
-	_ = a[i]
+	_ = a[1]
 	return 2
 }
 
-func _() (x int) {
+func _(a []int) (x int) {
 	x = 1
-	_ = a[i:j]
+	_ = a[2:4]
 	return 2
 }
 
-func _() (x int) {
+func _(a, b interface{}) (x int) {
 	x = 1
 	_ = a == b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
 	_ = a / b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
-	a /= b
+	_ = a / b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
 	_ = a % b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
-	a %= b
+	_ = a % b
 	return 2
 }
 
-func _() (x int) {
+func _(a *struct{ b int }) (x int) {
 	x = 1
 	_ = a.b
 	return 2
 }
 
-func _() (x int) {
+func _(a *int) (x int) {
 	x = 1
 	_ = *a
 	return 2
 }
 
-func _() (x int) {
+func _(a interface{}) (x int) {
 	x = 1
 	_ = a.(int)
 	return 2
 }
 
-func _() (x int) {
+func _(a chan int) (x int) {
 	x = 1
-	a <- b
+	a <- 1
 	return 2
 }
 
@@ -395,6 +396,8 @@ func _() {
 		fallthrough
 	case b:
 	}
+	x = 0
+	_ = x
 }
 
 func _() {
