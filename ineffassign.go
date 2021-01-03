@@ -28,14 +28,9 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func checkPath(pass *analysis.Pass) (interface{}, error) {
-files:
 	for _, file := range pass.Files {
-		for _, cg := range file.Comments {
-			for _, c := range cg.List {
-				if strings.HasPrefix(c.Text, "// Code generated ") && strings.HasSuffix(c.Text, " DO NOT EDIT.") {
-					continue files
-				}
-			}
+		if isGenerated(file) {
+			continue
 		}
 
 		bld := &builder{vars: map[*ast.Object]*variable{}}
@@ -56,6 +51,18 @@ files:
 	}
 
 	return nil, nil
+}
+
+func isGenerated(file *ast.File) bool {
+	for _, cg := range file.Comments {
+		for _, c := range cg.List {
+			if strings.HasPrefix(c.Text, "// Code generated ") && strings.HasSuffix(c.Text, " DO NOT EDIT.") {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 type builder struct {
