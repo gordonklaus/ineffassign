@@ -19,12 +19,12 @@ func _() {
 func _() {
 	var x int
 	_ = x
-	x = 0 //x
+	x = 0 // want "ineffectual assignment to x"
 }
 
 func _() {
 	var x int
-	x = 0 //x
+	x = 0 // want "ineffectual assignment to x"
 	x = 0
 	_ = x
 }
@@ -42,20 +42,20 @@ func _() {
 }
 
 func _() {
-	x := true //x
+	x := true // want "ineffectual assignment to x"
 	x = false
 	_ = x
 }
 
 func _() {
 	false := "not the real false"
-	x := false //x
+	x := false // want "ineffectual assignment to x"
 	x = "also not false"
 	_ = x
 }
 
 func _() {
-	x := T(0)
+	x := int(0)
 	x = 0
 	_ = x
 }
@@ -67,13 +67,13 @@ func _() {
 }
 
 func _() {
-	x := "abc" //x
+	x := "abc" // want "ineffectual assignment to x"
 	x = "def"
 	_ = x
 }
 
 func _() {
-	x := 1 //x
+	x := 1 // want "ineffectual assignment to x"
 	x = 0
 	_ = x
 }
@@ -105,18 +105,18 @@ func _() {
 }
 
 func _() {
-	x := 1 //x
+	x := 1 // want "ineffectual assignment to x"
 	if b {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	}
 	x = 0
 	_ = x
 }
 
 func _() {
-	x := 1 //x
+	x := 1 // want "ineffectual assignment to x"
 	for b {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	}
 	x = 0
 	_ = x
@@ -134,13 +134,13 @@ func _() {
 }
 
 func _() {
-	x := 1 //x
+	x := 1 // want "ineffectual assignment to x"
 	if b {
-		x = 0 //x
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
+		x = 0 // want "ineffectual assignment to x"
 	}
 	if b {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	}
 	x = 0
 	_ = x
@@ -149,7 +149,7 @@ func _() {
 func _() {
 	x := 0
 	if b {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 		x = 0
 	}
 	if b {
@@ -170,7 +170,7 @@ func _() {
 	x := 0
 	for {
 		_ = x
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 		x = 0
 	}
 }
@@ -178,7 +178,7 @@ func _() {
 func _() {
 	x := 0
 	for {
-		x += 0 //x
+		x += 0 // want "ineffectual assignment to x"
 		x = 0
 	}
 }
@@ -186,7 +186,7 @@ func _() {
 func _() {
 	x := 0
 	for {
-		x++ //x
+		x++ // want "ineffectual assignment to x"
 		x = 0
 	}
 }
@@ -205,21 +205,22 @@ func _() {
 }
 
 func _() {
-	x := 0
+	type T struct{ f int }
+	x := T{}
 	_ = x.f
-	x = 0
+	x = T{}
 }
 
 func _() {
-	x := 0
+	x := []int{}
 	_ = &x[0]
-	x = 0
+	x = []int{}
 }
 
 func _() {
-	x := 0
+	x := []int{}
 	_ = x[:]
-	x = 0
+	x = []int{}
 }
 
 func _() {
@@ -268,13 +269,13 @@ func _() (x int) {
 }
 
 func _() (x int) {
-	x = 0 //x
+	x = 0 // want "ineffectual assignment to x"
 	x = 0
 	return
 }
 
 func _() (x int) {
-	x = 0 //x
+	x = 0 // want "ineffectual assignment to x"
 	return 0
 }
 
@@ -283,75 +284,75 @@ func _() (x int) {
 	return x
 }
 
-func _() (x int) {
+func _(anyFunctionMightPanic func()) (x int) {
 	x = 1
 	anyFunctionMightPanic()
 	return 2
 }
 
-func _() (x int) {
+func _(a []int) (x int) {
 	x = 1
-	_ = a[i]
+	_ = a[1]
 	return 2
 }
 
-func _() (x int) {
+func _(a []int) (x int) {
 	x = 1
-	_ = a[i:j]
+	_ = a[2:4]
 	return 2
 }
 
-func _() (x int) {
+func _(a, b interface{}) (x int) {
 	x = 1
 	_ = a == b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
 	_ = a / b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
-	a /= b
+	_ = a / b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
 	_ = a % b
 	return 2
 }
 
-func _() (x int) {
+func _(a, b int) (x int) {
 	x = 1
-	a %= b
+	_ = a % b
 	return 2
 }
 
-func _() (x int) {
+func _(a *struct{ b int }) (x int) {
 	x = 1
 	_ = a.b
 	return 2
 }
 
-func _() (x int) {
+func _(a *int) (x int) {
 	x = 1
 	_ = *a
 	return 2
 }
 
-func _() (x int) {
+func _(a interface{}) (x int) {
 	x = 1
 	_ = a.(int)
 	return 2
 }
 
-func _() (x int) {
+func _(a chan int) (x int) {
 	x = 1
-	a <- b
+	a <- 1
 	return 2
 }
 
@@ -391,10 +392,12 @@ func _() {
 	var x int
 	switch b {
 	default:
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 		fallthrough
 	case b:
 	}
+	x = 0
+	_ = x
 }
 
 func _() {
@@ -436,16 +439,16 @@ func _() {
 	var ch chan int
 	select {
 	case ch <- 0:
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	case <-ch:
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	default:
 		_ = x
 	}
 }
 
 func _() {
-	x := 1 //x
+	x := 1 // want "ineffectual assignment to x"
 	var ch chan int
 	select {
 	case ch <- 0:
@@ -492,7 +495,7 @@ func _() {
 func _() {
 	var x int
 	if b {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 	}
 	if x = 0; b {
 
@@ -546,7 +549,7 @@ func _() {
 func _() {
 	x := 0
 	for x < 0 {
-		x = 0 //x
+		x = 0 // want "ineffectual assignment to x"
 		if b {
 			break
 		}
@@ -584,7 +587,7 @@ func _() {
 	var x int
 	for {
 		if b {
-			x = 0 //x
+			x = 0 // want "ineffectual assignment to x"
 			break
 		}
 		_ = x
@@ -620,7 +623,7 @@ func _() {
 func _() {
 	x := 0
 	if b {
-		x = 1 // x
+		x = 1 // want "ineffectual assignment to x"
 		return
 	}
 	_ = x
