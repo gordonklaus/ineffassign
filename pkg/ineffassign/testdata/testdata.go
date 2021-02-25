@@ -263,6 +263,48 @@ func _() {
 	}()
 }
 
+func _() {
+	x := 0
+	x = 0 // want "ineffectual assignment to x"
+	x = 0
+	_ = func() {
+		x = 0
+
+		_ = x
+	}
+	_ = x
+}
+
+func _() {
+	x := 0
+	x = 0 // want "ineffectual assignment to x"
+	x = 0
+	_ = func() {
+		_ = x
+	}
+	x = 0
+	_ = x
+}
+
+func _() {
+	x := 0
+	x = 0 // want "ineffectual assignment to x"
+	x = 0
+	_ = &x
+}
+
+func _() {
+	x := []int{} // want "ineffectual assignment to x"
+	x = []int{}
+	_ = &x[0]
+}
+
+func _() {
+	x := []int{} // want "ineffectual assignment to x"
+	x = []int{}
+	_ = x[:]
+}
+
 func _() (x int) {
 	x = 0
 	return

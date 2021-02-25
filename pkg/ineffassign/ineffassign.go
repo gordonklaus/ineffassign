@@ -466,7 +466,7 @@ func (bld *builder) newOp(id *ast.Ident, assign bool) {
 	}
 	v.escapes = v.escapes || v.fundept > 0 || bld.block == nil
 
-	if b := bld.block; b != nil {
+	if b := bld.block; b != nil && !v.escapes {
 		b.ops[id.Obj] = append(b.ops[id.Obj], operation{id, assign})
 	}
 }
@@ -539,9 +539,6 @@ func (chk *checker) check(b *block) {
 	chk.seen[b] = true
 
 	for obj, ops := range b.ops {
-		if chk.vars[obj].escapes {
-			continue
-		}
 	ops:
 		for i, op := range ops {
 			if !op.assign {
@@ -559,7 +556,9 @@ func (chk *checker) check(b *block) {
 					continue ops
 				}
 			}
-			chk.ineff = append(chk.ineff, op.id)
+			if !chk.vars[obj].escapes {
+				chk.ineff = append(chk.ineff, op.id)
+			}
 		}
 	}
 
