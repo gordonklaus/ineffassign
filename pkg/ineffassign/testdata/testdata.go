@@ -328,71 +328,113 @@ func _() (x int) {
 
 func _(anyFunctionMightPanic func()) (x int) {
 	x = 1
+	defer func() {
+		recover()
+	}()
+	anyFunctionMightPanic()
+	return 2
+}
+
+func _(anyFunctionMightPanic func()) (x int) {
+	x = 1 // want "ineffectual assignment to x"
 	anyFunctionMightPanic()
 	return 2
 }
 
 func _(a []int) (x int) {
 	x = 1
+	defer func() {
+		recover()
+	}()
 	_ = a[1]
 	return 2
 }
 
 func _(a []int) (x int) {
 	x = 1
+	defer func() {
+		recover()
+	}()
 	_ = a[2:4]
 	return 2
 }
 
 func _(a, b interface{}) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a == b
 	return 2
 }
 
 func _(a, b int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a / b
 	return 2
 }
 
 func _(a, b int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a / b
 	return 2
 }
 
 func _(a, b int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a % b
 	return 2
 }
 
 func _(a, b int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a % b
 	return 2
 }
 
 func _(a *struct{ b int }) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a.b
 	return 2
 }
 
 func _(a *int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = *a
 	return 2
 }
 
 func _(a interface{}) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	_ = a.(int)
 	return 2
 }
 
 func _(a chan int) (x int) {
+	defer func() {
+		recover()
+	}()
 	x = 1
 	a <- 1
 	return 2
@@ -669,4 +711,16 @@ func _() {
 		return
 	}
 	_ = x
+}
+
+func returnErr() error {
+	return nil
+}
+
+func _() (err error) {
+	if 1 > 2 {
+		err = returnErr() // want "ineffectual assignment to err"
+	}
+	err = returnErr()
+	return
 }
