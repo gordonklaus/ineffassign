@@ -67,6 +67,43 @@ func _() {
 }
 
 func _() {
+	type T struct{}
+	x := (*T)(nil)
+	x = &T{}
+	_ = x
+}
+
+func _() {
+	x := (*struct{})(nil)
+	x = &struct{}{}
+	_ = x
+}
+
+func _() {
+	x := (func())(nil)
+	x = func() {}
+	_ = x
+}
+
+func _() {
+	x := interface{}(nil)
+	x = 1
+	_ = x
+}
+
+func _() {
+	x := map[int]int(nil)
+	x = map[int]int{}
+	_ = x
+}
+
+func _() {
+	x := chan int(nil)
+	x = make(chan int)
+	_ = x
+}
+
+func _() {
 	x := "abc" // want "ineffectual assignment to x"
 	x = "def"
 	_ = x
