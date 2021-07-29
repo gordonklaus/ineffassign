@@ -332,7 +332,7 @@ func isZeroInitializer(x ast.Expr) bool {
 			fun = s.X
 		}
 		switch fun.(type) {
-		case *ast.Ident, *ast.SelectorExpr, *ast.StructType, *ast.FuncType, *ast.InterfaceType, *ast.MapType, *ast.ChanType:
+		case *ast.Ident, *ast.SelectorExpr, *ast.ArrayType, *ast.StructType, *ast.FuncType, *ast.InterfaceType, *ast.MapType, *ast.ChanType:
 		default:
 			return false
 		}

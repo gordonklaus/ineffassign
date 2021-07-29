@@ -67,6 +67,12 @@ func _() {
 }
 
 func _() {
+	x := (*[3]int)(nil)
+	x = &[3]int{}
+	_ = x
+}
+
+func _() {
 	type T struct{}
 	x := (*T)(nil)
 	x = &T{}
