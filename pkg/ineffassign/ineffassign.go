@@ -1,5 +1,7 @@
 package ineffassign
 
+// adapted from https://github.com/gordonklaus/ineffassign/blob/2e10b26642541670df2672e035b2de19fcb04cab/pkg/ineffassign/ineffassign.go
+
 import (
 	"fmt"
 	"go/ast"
@@ -55,15 +57,20 @@ func isGenerated(file *ast.File) bool {
 	return false
 }
 
+type funcReturnSpec struct {
+	results  *ast.FieldList
+	hasDefer bool
+}
+
 type builder struct {
-	roots     []*block
-	block     *block
-	vars      map[*ast.Object]*variable
-	results   []*ast.FieldList
-	breaks    branchStack
-	continues branchStack
-	gotos     branchStack
-	labelStmt *ast.LabeledStmt
+	roots        []*block
+	block        *block
+	vars         map[*ast.Object]*variable
+	returnsStack []funcReturnSpec
+	breaks       branchStack
+	continues    branchStack
+	gotos        branchStack
+	labelStmt    *ast.LabeledStmt
 }
 
 type block struct {
@@ -158,8 +165,8 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		bld.swtch(n, n.Body.List)
 	case *ast.SelectStmt:
 		brek := bld.breaks.push(bld.stmtLabel(n))
-		for _, c := range n.Body.List {
-			c := c.(*ast.CommClause).Comm
+		for _, c0 := range n.Body.List {
+			c := c0.(*ast.CommClause).Comm
 			if s, ok := c.(*ast.AssignStmt); ok {
 				bld.walk(s.Rhs[0])
 			} else {
@@ -250,8 +257,8 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		for _, x := range n.Results {
 			bld.walk(x)
 		}
-		if res := bld.results[len(bld.results)-1]; res != nil {
-			for _, f := range res.List {
+		if res := bld.returnsStack[len(bld.returnsStack)-1]; res.results != nil {
+			for _, f := range res.results.List {
 				for _, id := range f.Names {
 					if n.Results != nil {
 						bld.assign(id)
@@ -314,6 +321,13 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 	case *ast.TypeAssertExpr:
 		bld.maybePanic()
 		return bld
+	case *ast.DeferStmt:
+		lastIdx := len(bld.returnsStack) - 1
+		bld.returnsStack[lastIdx] = funcReturnSpec{
+			results:  bld.returnsStack[lastIdx].results,
+			hasDefer: true,
+		}
+		return bld
 
 	default:
 		return bld
@@ -359,7 +373,7 @@ func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {
 	for _, v := range bld.vars {
 		v.fundept++
 	}
-	bld.results = append(bld.results, typ.Results)
+	bld.returnsStack = append(bld.returnsStack, funcReturnSpec{results: typ.Results, hasDefer: false})
 
 	b := bld.block
 	bld.newBlock()
@@ -368,7 +382,7 @@ func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {
 	bld.walk(body)
 	bld.block = b
 
-	bld.results = bld.results[:len(bld.results)-1]
+	bld.returnsStack = bld.returnsStack[:len(bld.returnsStack)-1]
 	for _, v := range bld.vars {
 		v.fundept--
 	}
@@ -422,16 +436,17 @@ func (bld *builder) swtch(stmt ast.Stmt, cases []ast.Stmt) {
 	bld.breaks.pop()
 }
 
-// An operation that might panic marks named function results as used.
+// An operation that might panic marks named function results as used, if the function has a "defer" statement
+// (and thus can potentially recover); see https://github.com/gordonklaus/ineffassign/issues/22
 func (bld *builder) maybePanic() {
-	if len(bld.results) == 0 {
+	if len(bld.returnsStack) == 0 {
 		return
 	}
-	res := bld.results[len(bld.results)-1]
-	if res == nil {
+	res := bld.returnsStack[len(bld.returnsStack)-1]
+	if res.results == nil || !res.hasDefer {
 		return
 	}
-	for _, f := range res.List {
+	for _, f := range res.results.List {
 		for _, id := range f.Names {
 			bld.use(id)
 		}
