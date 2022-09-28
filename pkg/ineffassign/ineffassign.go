@@ -430,7 +430,7 @@ func (bld *builder) swtch(stmt ast.Stmt, cases []ast.Stmt) {
 
 // If an operation might panic and be recovered, mark named function results as used.
 func (bld *builder) maybePanic() {
-	if !bld.defers[len(bld.defers)-1] {
+	if len(bld.defers) == 0 || !bld.defers[len(bld.defers)-1] {
 		return
 	}
 	if len(bld.results) == 0 {
