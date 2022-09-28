@@ -369,76 +369,96 @@ func _() (x int) {
 	return x
 }
 
-func _(anyFunctionMightPanic func()) (x int) {
-	x = 1
-	anyFunctionMightPanic()
+func _(mayPanic func()) (x int) {
+	x = 1 // want "ineffectual assignment to x"
+	mayPanic()
 	return 2
 }
 
 func _(a []int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a[1]
 	return 2
 }
 
 func _(a []int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a[2:4]
 	return 2
 }
 
 func _(a, b interface{}) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a == b
 	return 2
 }
 
 func _(a, b int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a / b
 	return 2
 }
 
 func _(a, b int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a / b
 	return 2
 }
 
 func _(a, b int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a % b
 	return 2
 }
 
 func _(a, b int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a % b
 	return 2
 }
 
 func _(a *struct{ b int }) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a.b
 	return 2
 }
 
 func _(a *int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = *a
 	return 2
 }
 
 func _(a interface{}) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	_ = a.(int)
 	return 2
 }
 
 func _(a chan int) (x int) {
-	x = 1
+	x = 1 // want "ineffectual assignment to x"
 	a <- 1
 	return 2
+}
+
+func _(mayPanic, mayRecover func()) (x int) {
+	defer mayRecover()
+	x = 1
+	mayPanic()
+	return 2
+}
+
+func _() {
+	defer func() {
+		x := 1 // want "ineffectual assignment to x"
+		x = 0
+		_ = x
+	}()
+	go func() {
+		x := 1 // want "ineffectual assignment to x"
+		x = 0
+		_ = x
+	}()
 }
 
 func _() {
