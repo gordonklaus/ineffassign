@@ -1,5 +1,10 @@
 package p
 
+import (
+	"fmt"
+	"sync"
+)
+
 var b bool
 
 func _() {
@@ -448,6 +453,12 @@ func _(mayPanic, mayRecover func()) (x int) {
 	return 2
 }
 
+func _(mayRecover func()) (x int) {
+	x = 1 // want "ineffectual assignment to x"
+	defer mayRecover()
+	return 2
+}
+
 func _() {
 	defer func() {
 		x := 1 // want "ineffectual assignment to x"
@@ -733,3 +744,17 @@ func _() {
 	}
 	_ = x
 }
+
+func f(mu *sync.Mutex) (n int, err error) {
+	n, err = g()
+	if err != nil {
+		err = fmt.Errorf("g: %w", err) // want "ineffectual assignment to err"
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	return n, nil
+}
+
+func g() (int, error) { return 0, nil }
