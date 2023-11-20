@@ -13,7 +13,7 @@ import (
 // Analyzer is the ineffassign analysis.Analyzer instance.
 var Analyzer = &analysis.Analyzer{
 	Name: "ineffassign",
-	Doc:  "detect ineffectual assignments in Go code",
+	Doc:  "detects when assignments to existing variables are not used",
 	Run:  checkPath,
 }
 
