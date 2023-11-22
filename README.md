@@ -6,7 +6,7 @@ This tool misses some cases because it does not consider any type information in
 
 ## Install
 
-    go get -u github.com/gordonklaus/ineffassign
+    go install github.com/gordonklaus/ineffassign@latest
 
 ## Usage
 
