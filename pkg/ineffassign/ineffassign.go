@@ -96,10 +96,10 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.FuncDecl:
 		if n.Body != nil {
-			bld.fun(n.Type, n.Body)
+			bld.fun(n.Recv, n.Type, n.Body)
 		}
 	case *ast.FuncLit:
-		bld.fun(n.Type, n.Body)
+		bld.fun(nil, n.Type, n.Body)
 	case *ast.IfStmt:
 		bld.walk(n.Init)
 		bld.walk(n.Cond)
@@ -362,7 +362,7 @@ func isZeroInitializer(x ast.Expr) bool {
 	return false
 }
 
-func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {
+func (bld *builder) fun(recv *ast.FieldList, typ *ast.FuncType, body *ast.BlockStmt) {
 	for _, v := range bld.vars {
 		v.fundept++
 	}
@@ -372,6 +372,9 @@ func (bld *builder) fun(typ *ast.FuncType, body *ast.BlockStmt) {
 	b := bld.block
 	bld.newBlock()
 	bld.roots = append(bld.roots, bld.block)
+	if recv != nil {
+		bld.walk(recv)
+	}
 	bld.walk(typ)
 	bld.walk(body)
 	bld.block = b

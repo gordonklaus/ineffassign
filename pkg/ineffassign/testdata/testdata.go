@@ -758,3 +758,12 @@ func f(mu *sync.Mutex) (n int, err error) {
 }
 
 func g() (int, error) { return 0, nil }
+
+type T struct{}
+
+func (t T) _() {
+	func() {
+		t = T{}
+	}()
+	_ = t
+}
