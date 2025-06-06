@@ -17,9 +17,16 @@ var Analyzer = &analysis.Analyzer{
 	Run:  checkPath,
 }
 
+var checkGenerated bool
+
+func init() {
+	// analysis/passes/findcall analyzer uses this pattern to set up flags
+	Analyzer.Flags.BoolVar(&checkGenerated, "generated", false, "if true, also check generated files")
+}
+
 func checkPath(pass *analysis.Pass) (interface{}, error) {
 	for _, file := range pass.Files {
-		if isGenerated(file) {
+		if !checkGenerated && isGenerated(file) {
 			continue
 		}
 

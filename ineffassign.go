@@ -13,9 +13,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gordonklaus/ineffassign/pkg/ineffassign"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/packages"
+
+	"github.com/gordonklaus/ineffassign/pkg/ineffassign"
 )
 
 func main() {
@@ -35,7 +36,13 @@ func main() {
 		}
 		fmt.Fprintln(os.Stderr, "\nFlags:")
 		flag.PrintDefaults()
+		ineffassign.Analyzer.Flags.PrintDefaults()
 	}
+	// maddeningly, this is how analysis/singlechecker inits its flags
+	// simplified somewhat because this is not a general analyzer.
+	ineffassign.Analyzer.Flags.VisitAll(func(f *flag.Flag) {
+		flag.Var(f.Value, f.Name, f.Usage)
+	})
 	flag.Parse()
 
 	if *printVersion {
