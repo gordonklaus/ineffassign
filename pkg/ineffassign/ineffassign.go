@@ -35,6 +35,7 @@ func checkPath(pass *analysis.Pass) (interface{}, error) {
 		for _, id := range chk.ineff {
 			pass.Report(analysis.Diagnostic{
 				Pos:     id.Pos(),
+				End:     id.End(),
 				Message: fmt.Sprintf("ineffectual assignment to %s", id.Name),
 			})
 		}
