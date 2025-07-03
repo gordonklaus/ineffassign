@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"go/types"
 	"sort"
 	"strings"
 
@@ -23,7 +24,7 @@ func checkPath(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 
-		bld := &builder{vars: map[*ast.Object]*variable{}}
+		bld := &builder{vars: map[*ast.Object]*variable{}, pass: pass}
 		bld.walk(file)
 
 		chk := &checker{vars: bld.vars, seen: map[*block]bool{}}
@@ -66,6 +67,7 @@ type builder struct {
 	continues branchStack
 	gotos     branchStack
 	labelStmt *ast.LabeledStmt
+	pass      *analysis.Pass
 }
 
 type block struct {
@@ -300,10 +302,13 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		bld.maybePanic()
 		// A method call (possibly delayed via a method value) might implicitly take
 		// the address of its receiver, causing it to escape.
-		// We can't do any better here without knowing the variable's type.
+		// Use type information to determine if this is truly an escaping operation.
 		if id, ok := ident(n.X); ok {
 			if v, ok := bld.vars[id.Obj]; ok {
-				v.escapes = true
+				// Check if this is a method call that truly causes escaping
+				if bld.causesEscaping(n) {
+					v.escapes = true
+				}
 			}
 		}
 		return bld
@@ -547,6 +552,50 @@ func ident(x ast.Expr) (*ast.Ident, bool) {
 	}
 	id, ok := x.(*ast.Ident)
 	return id, ok
+}
+
+// causesEscaping determines if a selector expression truly causes a variable to escape.
+// It returns true for field access, pointer receiver methods, and method expressions,
+// but false for value receiver methods like Error().
+func (bld *builder) causesEscaping(selExpr *ast.SelectorExpr) bool {
+	// If we don't have type information, be conservative
+	if bld.pass == nil || bld.pass.TypesInfo == nil {
+		return true
+	}
+
+	// Check if this selector expression has selection information
+	sel, ok := bld.pass.TypesInfo.Selections[selExpr]
+	if !ok {
+		// No selection info means this might be a qualified identifier or other construct
+		// Be conservative and assume it escapes
+		return true
+	}
+
+	switch sel.Kind() {
+	case types.FieldVal:
+		// Field access can cause escaping if the field address is taken
+		return true
+	case types.MethodExpr:
+		// Method expressions like T.method always cause escaping
+		return true
+	case types.MethodVal:
+		// Method values: check if the method has a pointer receiver
+		obj := sel.Obj()
+		if fn, ok := obj.(*types.Func); ok {
+			sig := fn.Type().(*types.Signature)
+			recv := sig.Recv()
+			if recv != nil {
+				// Check if receiver is a pointer type
+				_, isPointer := recv.Type().(*types.Pointer)
+				return isPointer
+			}
+		}
+		// If we can't determine the receiver type, be conservative
+		return true
+	default:
+		// Unknown selection kind, be conservative
+		return true
+	}
 }
 
 type checker struct {
