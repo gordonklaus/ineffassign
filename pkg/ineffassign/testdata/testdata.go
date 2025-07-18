@@ -767,3 +767,23 @@ func (t T) _() {
 	}()
 	_ = t
 }
+func someFunction() error    { return nil }
+func anotherFunction(string) { return }
+
+// Test case reproducing the false negative with status.Errorf - now fixed!
+func _() error {
+	err := someFunction()
+	if err != nil {
+		anotherFunction(err.Error())
+	}
+
+	// This assignment is now correctly flagged because err.Error() uses a value receiver
+	err = someFunction() // want "ineffectual assignment to err"
+
+	err = someFunction()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
