@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/token"
 	"sort"
-	"strings"
 
 	"golang.org/x/tools/go/analysis"
 )
