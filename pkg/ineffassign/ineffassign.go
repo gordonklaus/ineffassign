@@ -9,11 +9,17 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+var checkEscapingErrors bool
+
 // Analyzer is the ineffassign analysis.Analyzer instance.
 var Analyzer = &analysis.Analyzer{
 	Name: "ineffassign",
 	Doc:  "detects when assignments to existing variables are not used",
 	Run:  checkPath,
+}
+
+func init() {
+	Analyzer.Flags.BoolVar(&checkEscapingErrors, "check-escaping-errors", false, "check escaping errors named 'err', may cause false positives")
 }
 
 func checkPath(pass *analysis.Pass) (interface{}, error) {
@@ -279,7 +285,9 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		}
 		if ok && n.Op == token.AND {
 			if v, ok := bld.vars[id.Obj]; ok {
-				v.escapes = true
+				if !checkEscapingErrors && id.Obj.Name != "err" {
+					v.escapes = true
+				}
 			}
 		}
 		return bld

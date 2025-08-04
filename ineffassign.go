@@ -35,7 +35,11 @@ func main() {
 		}
 		fmt.Fprintln(os.Stderr, "\nFlags:")
 		flag.PrintDefaults()
+		ineffassign.Analyzer.Flags.PrintDefaults()
 	}
+	ineffassign.Analyzer.Flags.VisitAll(func(f *flag.Flag) {
+		flag.Var(f.Value, f.Name, f.Usage)
+	})
 	flag.Parse()
 
 	if *printVersion {
