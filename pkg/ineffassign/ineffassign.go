@@ -19,7 +19,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func init() {
-	Analyzer.Flags.BoolVar(&checkEscapingErrors, "check-escaping-errors", false, "check escaping errors named 'err', may cause false positives")
+	Analyzer.Flags.BoolVar(&checkEscapingErrors, "check-escaping-errors", false, "check escaping variables of type error, may cause false positives")
 }
 
 func checkPath(pass *analysis.Pass) (interface{}, error) {
@@ -284,11 +284,7 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 			id, ok = ident(ix.X)
 		}
 		if ok && n.Op == token.AND {
-			if v, ok := bld.vars[id.Obj]; ok {
-				if !checkEscapingErrors && id.Obj.Name != "err" {
-					v.escapes = true
-				}
-			}
+			bld.escape(id)
 		}
 		return bld
 	case *ast.SelectorExpr:
@@ -297,18 +293,14 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		// the address of its receiver, causing it to escape.
 		// We can't do any better here without knowing the variable's type.
 		if id, ok := ident(n.X); ok {
-			if v, ok := bld.vars[id.Obj]; ok {
-				v.escapes = true
-			}
+			bld.escape(id)
 		}
 		return bld
 	case *ast.SliceExpr:
 		bld.maybePanic()
 		// We don't care about slicing into slices, but without type information we can do no better.
 		if id, ok := ident(n.X); ok {
-			if v, ok := bld.vars[id.Obj]; ok {
-				v.escapes = true
-			}
+			bld.escape(id)
 		}
 		return bld
 	case *ast.StarExpr:
@@ -322,6 +314,21 @@ func (bld *builder) Visit(n ast.Node) ast.Visitor {
 		return bld
 	}
 	return nil
+}
+
+func (bld *builder) escape(id *ast.Ident) {
+	if checkEscapingErrors && id.Obj != nil {
+		if d, ok := id.Obj.Decl.(*ast.ValueSpec); ok {
+			if t, ok := d.Type.(*ast.Ident); ok {
+				if t.Name == "error" {
+					return
+				}
+			}
+		}
+	}
+	if v, ok := bld.vars[id.Obj]; ok {
+		v.escapes = true
+	}
 }
 
 func isZeroInitializer(x ast.Expr) bool {
